@@ -1,0 +1,19 @@
+{
+    "name": "void-monorepo",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Security-First Personal Cloud Drive",
+    "scripts": {
+        "dev": "cd backend && npm run dev",
+        "build": "cd backend && npm run build",
+        "test": "cd backend && npm run test",
+        "docker:up": "docker-compose -f infrastructure/docker/docker-compose.dev.yml up -d",
+        "docker:down": "docker-compose -f infrastructure/docker/docker-compose.dev.yml down",
+        "docker:logs": "docker-compose -f infrastructure/docker/docker-compose.dev.yml logs -f",
+        "docker:ps": "docker-compose -f infrastructure/docker/docker-compose.dev.yml ps"
+    },
+    "engines": {
+        "node": ">=22.0.0",
+        "npm": ">=10.0.0"
+    }
+}
