@@ -22,25 +22,39 @@ export class TokenService {
         return secret;
     }
 
-    private static readonly ACCESS_TOKEN_EXPIRES_IN = '15m';
-    private static readonly REFRESH_TOKEN_EXPIRES_IN = '7d';
     private static readonly JWT_OPTIONS = {
         issuer: 'void-cloud-drive',
         audience: 'void-cloud-drive-api',
     };
 
+    private static getAccessTokenExpiry(): string {
+        return process.env.JWT_ACCESS_TOKEN_EXPIRY || '15m';
+    }
+
+    private static getRefreshTokenExpiry(): string {
+        return process.env.JWT_REFRESH_TOKEN_EXPIRY || '7d';
+    }
+
     static generateAccessToken(payload: TokenPayload): string {
-        return jwt.sign(payload, this.getJwtSecret(), {
-            ...this.JWT_OPTIONS,
-            expiresIn: this.ACCESS_TOKEN_EXPIRES_IN,
-        });
+        return jwt.sign(
+            payload,
+            this.getJwtSecret(),
+            {
+                ...this.JWT_OPTIONS,
+                expiresIn: this.getAccessTokenExpiry(),
+            } as jwt.SignOptions
+        );
     }
 
     static generateRefreshToken(payload: TokenPayload): string {
-        return jwt.sign(payload, this.getJwtSecret(), {
-            ...this.JWT_OPTIONS,
-            expiresIn: this.REFRESH_TOKEN_EXPIRES_IN,
-        });
+        return jwt.sign(
+            payload,
+            this.getJwtSecret(),
+            {
+                ...this.JWT_OPTIONS,
+                expiresIn: this.getRefreshTokenExpiry(),
+            } as jwt.SignOptions
+        );
     }
 
     static verifyAccessToken(token: string): TokenPayload {

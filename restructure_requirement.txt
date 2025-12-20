@@ -1,0 +1,13 @@
+void-cloud-drive - personal cloud storage system
+
+
+My requirements:- 
+
+Auth and security -> 
+- the user will have a role admin and user
+- and the admin role will se set to onw user which is me and other user who will be there will be of role users 
+- registering of users can only be done by the admin no manual registration 
+-  login will happen as it was happening like email password and then totp
+- there will be tract of where the user has logged in and if the user logs in in more than 3 devices then it should restrict that, and the devices number will be decied from env
+- all the secuirty features as there were  will be like the jwt,token rotation like that featurest with highest level of security preventing all types of attacks
+- you suggest according to my need and use case what else will be benificial for family usecase this app ail strictyly use by my family members and no other person so tell me 

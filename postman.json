@@ -304,7 +304,7 @@
 					"name": "Login",
 					"item": [
 						{
-							"name": "Verify Credentials - Success",
+							"name": "Login - Success",
 							"event": [
 								{
 									"listen": "test",
@@ -343,22 +343,21 @@
 									"raw": "{\n    \"email\": \"{{testEmail}}\",\n    \"password\": \"Test123!@#\"\n}"
 								},
 								"url": {
-									"raw": "{{base_url}}/api/auth/login/verify-credentials",
+									"raw": "{{base_url}}/api/auth/login",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"api",
 										"auth",
-										"login",
-										"verify-credentials"
+										"login"
 									]
 								},
-								"description": "Step 1: Verify user credentials (email and password)"
+								"description": "Step 1: Login with email and password"
 							}
 						},
 						{
-							"name": "Verify Credentials - Wrong Password",
+							"name": "Login - Wrong Password",
 							"event": [
 								{
 									"listen": "test",
@@ -390,22 +389,21 @@
 									"raw": "{\n    \"email\": \"{{testEmail}}\",\n    \"password\": \"WrongPassword123!@#\"\n}"
 								},
 								"url": {
-									"raw": "{{base_url}}/api/auth/login/verify-credentials",
+									"raw": "{{base_url}}/api/auth/login",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"api",
 										"auth",
-										"login",
-										"verify-credentials"
+										"login"
 									]
 								},
 								"description": "Test with incorrect password"
 							}
 						},
 						{
-							"name": "Verify Credentials - Non-existent User",
+							"name": "Login - Non-existent User",
 							"event": [
 								{
 									"listen": "test",
@@ -437,22 +435,21 @@
 									"raw": "{\n    \"email\": \"nonexistent@example.com\",\n    \"password\": \"Test123!@#\"\n}"
 								},
 								"url": {
-									"raw": "{{base_url}}/api/auth/login/verify-credentials",
+									"raw": "{{base_url}}/api/auth/login",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"api",
 										"auth",
-										"login",
-										"verify-credentials"
+										"login"
 									]
 								},
 								"description": "Test with email that doesn't exist"
 							}
 						},
 						{
-							"name": "Verify Credentials - Invalid Email Format",
+							"name": "Login - Invalid Email Format",
 							"event": [
 								{
 									"listen": "test",
@@ -484,15 +481,14 @@
 									"raw": "{\n    \"email\": \"not-an-email\",\n    \"password\": \"Test123!@#\"\n}"
 								},
 								"url": {
-									"raw": "{{base_url}}/api/auth/login/verify-credentials",
+									"raw": "{{base_url}}/api/auth/login",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"api",
 										"auth",
-										"login",
-										"verify-credentials"
+										"login"
 									]
 								},
 								"description": "Test with invalid email format"
@@ -542,14 +538,13 @@
 									"raw": "{\n    \"sessionToken\": \"{{sessionToken}}\",\n    \"totpCode\": \"123456\"\n}"
 								},
 								"url": {
-									"raw": "{{base_url}}/api/auth/login/verify-totp",
+									"raw": "{{base_url}}/api/auth/verify-totp",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"api",
 										"auth",
-										"login",
 										"verify-totp"
 									]
 								},
@@ -589,14 +584,13 @@
 									"raw": "{\n    \"sessionToken\": \"{{sessionToken}}\",\n    \"totpCode\": \"000000\"\n}"
 								},
 								"url": {
-									"raw": "{{base_url}}/api/auth/login/verify-totp",
+									"raw": "{{base_url}}/api/auth/verify-totp",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"api",
 										"auth",
-										"login",
 										"verify-totp"
 									]
 								},
@@ -636,14 +630,13 @@
 									"raw": "{\n    \"sessionToken\": \"invalid-session-token\",\n    \"totpCode\": \"123456\"\n}"
 								},
 								"url": {
-									"raw": "{{base_url}}/api/auth/login/verify-totp",
+									"raw": "{{base_url}}/api/auth/verify-totp",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"api",
 										"auth",
-										"login",
 										"verify-totp"
 									]
 								},
@@ -683,14 +676,13 @@
 									"raw": "{\n    \"sessionToken\": \"{{sessionToken}}\"\n}"
 								},
 								"url": {
-									"raw": "{{base_url}}/api/auth/login/verify-totp",
+									"raw": "{{base_url}}/api/auth/verify-totp",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"api",
 										"auth",
-										"login",
 										"verify-totp"
 									]
 								},
@@ -1194,6 +1186,834 @@
 						},
 						"description": "Test profile endpoint with expired token (example token - replace with actual expired token)"
 					}
+				}
+			]
+		},
+		{
+			"name": "File Management",
+			"item": [
+				{
+					"name": "Create Folder",
+					"item": [
+						{
+							"name": "Create Folder - Root",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response has folderId\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.have.property('folderId');",
+											"    pm.expect(jsonData).to.have.property('folderName');",
+											"    pm.expect(jsonData).to.have.property('parentFolderId');",
+											"});",
+											"",
+											"// Save folder ID",
+											"if (pm.response.code === 201) {",
+											"    var jsonData = pm.response.json();",
+											"    pm.environment.set('folderId', jsonData.folderId);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"folderName\": \"My Documents\",\n    \"parentFolderId\": null,\n    \"accessType\": \"private\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/folder",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"folder"
+									]
+								},
+								"description": "Create a folder in root directory"
+							}
+						},
+						{
+							"name": "Create Folder - In Parent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response has parentFolderId\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.parentFolderId).to.not.be.null;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"folderName\": \"Subfolder\",\n    \"parentFolderId\": \"{{folderId}}\",\n    \"accessType\": \"private\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/folder",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"folder"
+									]
+								},
+								"description": "Create a folder inside another folder"
+							}
+						}
+					]
+				},
+				{
+					"name": "Upload File",
+					"item": [
+						{
+							"name": "Upload File - Root",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response has fileId\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.have.property('fileId');",
+											"    pm.expect(jsonData).to.have.property('fileName');",
+											"    pm.expect(jsonData).to.have.property('size');",
+											"});",
+											"",
+											"// Save file ID",
+											"if (pm.response.code === 201) {",
+											"    var jsonData = pm.response.json();",
+											"    pm.environment.set('fileId', jsonData.fileId);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": []
+										},
+										{
+											"key": "parentFolderId",
+											"value": "",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "accessType",
+											"value": "private",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/upload",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"upload"
+									]
+								},
+								"description": "Upload a file to root directory. Select a file in the form-data."
+							}
+						},
+						{
+							"name": "Upload File - To Folder",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"pm.test(\"Response has parentFolderId\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.parentFolderId).to.not.be.null;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": []
+										},
+										{
+											"key": "parentFolderId",
+											"value": "{{folderId}}",
+											"type": "text"
+										},
+										{
+											"key": "accessType",
+											"value": "private",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/upload",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"upload"
+									]
+								},
+								"description": "Upload a file to a specific folder"
+							}
+						}
+					]
+				},
+				{
+					"name": "List Files",
+					"item": [
+						{
+							"name": "List Files - Root",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response has files array\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.have.property('files');",
+											"    pm.expect(jsonData.files).to.be.an('array');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/files/list",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"list"
+									]
+								},
+								"description": "List all files in root directory"
+							}
+						},
+						{
+							"name": "List Files - In Folder",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/files/list?parentFolderId={{folderId}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"list"
+									],
+									"query": [
+										{
+											"key": "parentFolderId",
+											"value": "{{folderId}}"
+										}
+									]
+								},
+								"description": "List files in a specific folder"
+							}
+						}
+					]
+				},
+				{
+					"name": "Download File",
+					"item": [
+						{
+							"name": "Download File - Authenticated",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response has file content\", function () {",
+											"    pm.expect(pm.response.headers.get('Content-Type')).to.exist;",
+											"    pm.expect(pm.response.headers.get('Content-Disposition')).to.exist;",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/files/download/{{fileId}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"download",
+										"{{fileId}}"
+									]
+								},
+								"description": "Download a file (requires authentication)"
+							}
+						},
+						{
+							"name": "Download File - With Share Token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/files/download/{{fileId}}?shareToken={{shareToken}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"download",
+										"{{fileId}}"
+									],
+									"query": [
+										{
+											"key": "shareToken",
+											"value": "{{shareToken}}"
+										}
+									]
+								},
+								"description": "Download a file using share token (no authentication needed)"
+							}
+						}
+					]
+				},
+				{
+					"name": "Move File",
+					"item": [
+						{
+							"name": "Move File - To Folder",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response has newParentId\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.have.property('newParentFolderId');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"newParentFolderId\": \"{{folderId}}\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/move/{{fileId}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"move",
+										"{{fileId}}"
+									]
+								},
+								"description": "Move a file to a different folder"
+							}
+						},
+						{
+							"name": "Move File - To Root",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"newParentFolderId\": null\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/move/{{fileId}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"move",
+										"{{fileId}}"
+									]
+								},
+								"description": "Move a file back to root directory"
+							}
+						}
+					]
+				},
+				{
+					"name": "Set File Access",
+					"item": [
+						{
+							"name": "Set Access - Link Shared",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response has shareToken\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.have.property('shareToken');",
+											"    pm.expect(jsonData.shareToken).to.not.be.null;",
+											"});",
+											"",
+											"// Save share token",
+											"if (pm.response.code === 200) {",
+											"    var jsonData = pm.response.json();",
+											"    if (jsonData.shareToken) {",
+											"        pm.environment.set('shareToken', jsonData.shareToken);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"accessType\": \"link_shared\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/access/{{fileId}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"access",
+										"{{fileId}}"
+									]
+								},
+								"description": "Set file access to link_shared (generates share token)"
+							}
+						},
+						{
+							"name": "Set Access - Public",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Access type is public\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData.accessType).to.eql('public');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"accessType\": \"public\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/access/{{fileId}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"access",
+										"{{fileId}}"
+									]
+								},
+								"description": "Set file access to public (anyone can access)"
+							}
+						},
+						{
+							"name": "Set Access - Private",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"accessType\": \"private\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/access/{{fileId}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"access",
+										"{{fileId}}"
+									]
+								},
+								"description": "Set file access back to private"
+							}
+						}
+					]
+				},
+				{
+					"name": "Share File",
+					"item": [
+						{
+							"name": "Share File - With User",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Response has sharedWithUserId\", function () {",
+											"    var jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.have.property('sharedWithUserId');",
+											"    pm.expect(jsonData).to.have.property('permissionType');",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"sharedWithUserId\": \"other-user-id-here\",\n    \"permissionType\": \"read\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/share/{{fileId}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"share",
+										"{{fileId}}"
+									]
+								},
+								"description": "Share a file with a specific user. Replace 'other-user-id-here' with actual user ID. Permission types: read, write, delete"
+							}
+						}
+					]
 				}
 			]
 		}

@@ -1,16 +1,16 @@
-import { VerifyCredentialsUseCase } from '@application/use-cases/auth/VerifyCredentialsUseCase';
+import { LoginUseCase } from '@application/use-cases/auth/LoginUseCase';
 import { MockUserRepository, createMockUser } from '../../../helpers/mockFactories';
 import { PasswordHasher } from '@infrastructure/encryption/PasswordHasher';
 import { InvalidCredentialsError } from '@domain/errors/DomainError';
 import { SessionService } from '@infrastructure/encryption/SessionService';
 
-describe('VerifyCredentialsUseCase', () => {
-  let useCase: VerifyCredentialsUseCase;
+describe('LoginUseCase', () => {
+  let useCase: LoginUseCase;
   let mockRepository: MockUserRepository;
 
   beforeEach(() => {
     mockRepository = new MockUserRepository();
-    useCase = new VerifyCredentialsUseCase(mockRepository);
+    useCase = new LoginUseCase(mockRepository);
   });
 
   afterEach(() => {

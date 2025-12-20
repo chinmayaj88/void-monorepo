@@ -24,7 +24,7 @@
 ### 2. **Application Layer** (100% Coverage)
 - ✅ **Use Cases**
   - `RegisterUserUseCase.test.ts` - Complete flow
-  - `VerifyCredentialsUseCase.test.ts` - Credential verification
+  - `LoginUseCase.test.ts` - Login credential verification
   - `VerifyTotpUseCase.test.ts` - TOTP validation
   - `RefreshTokenUseCase.test.ts` - Token refresh & rotation
 

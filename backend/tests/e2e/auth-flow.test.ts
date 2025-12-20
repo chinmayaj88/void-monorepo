@@ -148,22 +148,22 @@ describe('E2E Authentication Flow', () => {
         console.log('Skipping test: Database not available');
         return;
       }
-      // Step 1: Verify credentials
-      const credentialsResponse = await request(app)
-        .post('/api/auth/login/verify-credentials')
+      // Step 1: Login
+      const loginResponse = await request(app)
+        .post('/api/auth/login')
         .send({ email: testEmail, password: testPassword })
         .expect(200);
 
-      expect(credentialsResponse.body).toHaveProperty('sessionToken');
-      expect(credentialsResponse.body).toHaveProperty('expiresIn', 180);
+      expect(loginResponse.body).toHaveProperty('sessionToken');
+      expect(loginResponse.body).toHaveProperty('expiresIn', 180);
 
-      const sessionToken = credentialsResponse.body.sessionToken;
+      const sessionToken = loginResponse.body.sessionToken;
 
       // Step 2: Verify TOTP
       const totpCode = authenticator.generate(totpSecret);
 
       const totpResponse = await request(app)
-        .post('/api/auth/login/verify-totp')
+        .post('/api/auth/verify-totp')
         .send({ sessionToken, totpCode })
         .expect(200);
 
@@ -179,7 +179,7 @@ describe('E2E Authentication Flow', () => {
         return;
       }
       const response = await request(app)
-        .post('/api/auth/login/verify-credentials')
+        .post('/api/auth/login')
         .send({ email: testEmail, password: 'WrongPassword123!' })
         .expect(401);
 
@@ -192,16 +192,16 @@ describe('E2E Authentication Flow', () => {
         return;
       }
       // Get session token
-      const credentialsResponse = await request(app)
-        .post('/api/auth/login/verify-credentials')
+      const loginResponse = await request(app)
+        .post('/api/auth/login')
         .send({ email: testEmail, password: testPassword })
         .expect(200);
 
-      const sessionToken = credentialsResponse.body.sessionToken;
+      const sessionToken = loginResponse.body.sessionToken;
 
       // Try with wrong TOTP
       const response = await request(app)
-        .post('/api/auth/login/verify-totp')
+        .post('/api/auth/verify-totp')
         .send({ sessionToken, totpCode: '000000' })
         .expect(400);
 
@@ -215,7 +215,7 @@ describe('E2E Authentication Flow', () => {
       }
       // Test with invalid token format
       const response = await request(app)
-        .post('/api/auth/login/verify-totp')
+        .post('/api/auth/verify-totp')
         .send({ sessionToken: 'invalid-session-token', totpCode: '123456' })
         .expect(401);
 
@@ -241,20 +241,20 @@ describe('E2E Authentication Flow', () => {
 
       const totpSecret = registerResponse.body.totpSecret;
 
-      const credentialsResponse = await request(app)
-        .post('/api/auth/login/verify-credentials')
+      const loginResponse = await request(app)
+        .post('/api/auth/login')
         .send({ email, password })
         .expect(200);
 
-      const sessionToken = credentialsResponse.body.sessionToken;
+      const sessionToken = loginResponse.body.sessionToken;
       const totpCode = authenticator.generate(totpSecret);
 
-      const loginResponse = await request(app)
-        .post('/api/auth/login/verify-totp')
+      const totpResponse = await request(app)
+        .post('/api/auth/verify-totp')
         .send({ sessionToken, totpCode })
         .expect(200);
 
-      refreshToken = loginResponse.body.refreshToken;
+      refreshToken = totpResponse.body.refreshToken;
     });
 
     it('should refresh tokens successfully', async () => {
@@ -318,20 +318,20 @@ describe('E2E Authentication Flow', () => {
 
       const totpSecret = registerResponse.body.totpSecret;
 
-      const credentialsResponse = await request(app)
-        .post('/api/auth/login/verify-credentials')
+      const loginResponse = await request(app)
+        .post('/api/auth/login')
         .send({ email, password })
         .expect(200);
 
-      const sessionToken = credentialsResponse.body.sessionToken;
+      const sessionToken = loginResponse.body.sessionToken;
       const totpCode = authenticator.generate(totpSecret);
 
-      const loginResponse = await request(app)
-        .post('/api/auth/login/verify-totp')
+      const totpResponse = await request(app)
+        .post('/api/auth/verify-totp')
         .send({ sessionToken, totpCode })
         .expect(200);
 
-      accessToken = loginResponse.body.accessToken;
+      accessToken = totpResponse.body.accessToken;
     });
 
     it('should access protected route with valid token', async () => {
@@ -387,20 +387,20 @@ describe('E2E Authentication Flow', () => {
 
       const totpSecret = registerResponse.body.totpSecret;
 
-      const credentialsResponse = await request(app)
-        .post('/api/auth/login/verify-credentials')
+      const loginResponse = await request(app)
+        .post('/api/auth/login')
         .send({ email, password })
         .expect(200);
 
-      const sessionToken = credentialsResponse.body.sessionToken;
+      const sessionToken = loginResponse.body.sessionToken;
       const totpCode = authenticator.generate(totpSecret);
 
-      const loginResponse = await request(app)
-        .post('/api/auth/login/verify-totp')
+      const totpResponse = await request(app)
+        .post('/api/auth/verify-totp')
         .send({ sessionToken, totpCode })
         .expect(200);
 
-      refreshToken = loginResponse.body.refreshToken;
+      refreshToken = totpResponse.body.refreshToken;
     });
 
     it('should logout successfully', async () => {

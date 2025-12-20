@@ -24,6 +24,9 @@
 - 🔑 **Mandatory 2FA** - Every user must enable TOTP two-factor authentication
 - 💰 **Cost-Optimized** - Designed to run on Oracle Cloud Infrastructure Always Free tier
 - 🏗️ **Clean Architecture** - Maintainable, testable, and scalable codebase
+- 📁 **Folder Management** - Create folders, organize files, move items between folders
+- 🔒 **Google Drive-Style Permissions** - Private, public, link-shared, and user-specific sharing
+- ☁️ **OCI Object Storage** - Files stored in OCI buckets, not on server disk
 
 ## 🎯 Why Void?
 
@@ -59,8 +62,9 @@ npm install
 cd backend && npm install
 
 # 3. Set up environment
+cd backend
 cp .env.example .env
-# Edit .env with your configuration
+# Edit .env with your configuration (especially OCI settings)
 
 # 4. Start database
 docker-compose up -d
@@ -149,6 +153,7 @@ The project follows **Clean Architecture** with strict layer separation:
 - **Language**: TypeScript 5.x
 - **Framework**: Express.js 4.18
 - **Database**: PostgreSQL 15+
+- **File Storage**: OCI Object Storage (Oracle Cloud Infrastructure)
 - **Testing**: Jest, ts-jest, Supertest
 
 ### Security & Authentication
@@ -238,10 +243,26 @@ npm run test:e2e
 ### Authentication
 
 - `POST /api/auth/register` - Register new user
-- `POST /api/auth/login/verify-credentials` - Step 1: Verify email/password
-- `POST /api/auth/login/verify-totp` - Step 2: Verify TOTP code
+- `POST /api/auth/login` - Step 1: Login with email/password
+- `POST /api/auth/verify-totp` - Step 2: Verify TOTP code
 - `POST /api/auth/refresh` - Refresh access token
 - `POST /api/auth/logout` - Logout and invalidate tokens
+
+### File Management
+
+- `POST /api/files/upload` - Upload file (supports `parentFolderId` and `accessType`)
+- `GET /api/files/download/:fileId` - Download file (supports `?shareToken=xxx` for link access)
+- `GET /api/files/list?parentFolderId=xxx` - List files in folder (or root if no parentFolderId)
+
+### Folder Management
+
+- `POST /api/files/folder` - Create folder
+- `POST /api/files/move/:fileId` - Move file/folder to different folder
+
+### Permissions & Sharing
+
+- `PUT /api/files/access/:fileId` - Set access type (private/public/link_shared/shared)
+- `POST /api/files/share/:fileId` - Share file with specific user (read/write/delete permissions)
 
 ### Protected Routes
 

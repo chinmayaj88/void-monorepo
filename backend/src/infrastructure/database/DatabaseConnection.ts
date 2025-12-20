@@ -1,5 +1,6 @@
 import { Pool, PoolConfig } from 'pg';
 import { DatabaseConfigService } from '@infrastructure/config/DatabaseConfig';
+import { logger } from '@infrastructure/config/Logger';
 
 export class DatabaseConnection {
     private static pool: Pool | null = null;
@@ -8,11 +9,7 @@ export class DatabaseConnection {
         if (!this.pool) {
             const config = DatabaseConfigService.getConfig();
             const poolConfig: PoolConfig = {
-                host: config.host,
-                port: config.port,
-                database: config.database,
-                user: config.user,
-                password: config.password,
+                connectionString: config.connectionString,
                 max: config.maxConnections,
                 connectionTimeoutMillis: config.connectionTimeout,
                 idleTimeoutMillis: 30000,
@@ -22,7 +19,7 @@ export class DatabaseConnection {
             this.pool = new Pool(poolConfig);
 
             this.pool.on('error', (err) => {
-                console.error('Unexpected error on idle client', err);
+                logger.error('Unexpected error on idle client', { error: err.message, stack: err.stack });
             });
         }
 

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { DomainError } from '@domain/errors/DomainError';
 import { ZodError } from 'zod';
+import { logger } from '@infrastructure/config/Logger';
 
 interface ErrorResponse {
   error: string;
@@ -43,7 +44,7 @@ export function errorHandlerMiddleware(
 
   if (error instanceof DomainError) {
     const statusCode = getStatusCodeForDomainError(error);
-    console.warn(`Domain error [${error.constructor.name}]:`, error.message);
+    logger.warn(`Domain error [${error.constructor.name}]:`, error.message);
     res.status(statusCode).json(createErrorResponse(error.message));
     return;
   }
@@ -53,7 +54,7 @@ export function errorHandlerMiddleware(
     return;
   }
 
-  console.error('Unexpected error:', {
+  logger.error('Unexpected error', {
     message: error.message,
     stack: error.stack,
     url: req.url,
@@ -80,13 +81,17 @@ function getStatusCodeForDomainError(error: DomainError): number {
   // 401 Unauthorized - Authentication required
   if (
     errorName === 'InvalidCredentialsError' ||
-    errorName === 'InvalidTotpCodeError'
+    errorName === 'InvalidTotpCodeError' ||
+    errorName === 'UnauthorizedError'
   ) {
     return 401;
   }
 
   // 404 Not Found - Resource doesn't exist
-  if (errorName === 'UserNotFoundError') {
+  if (
+    errorName === 'UserNotFoundError' ||
+    errorName === 'FileNotFoundError'
+  ) {
     return 404;
   }
 
