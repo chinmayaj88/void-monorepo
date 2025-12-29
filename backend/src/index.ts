@@ -1,30 +1,40 @@
 import dotenv from 'dotenv';
-import path from 'path';
 import { createApp } from './app';
 import { DatabaseConnection } from '@infrastructure/database/DatabaseConnection';
+import { EnvValidator } from '@infrastructure/config/EnvValidator';
+import { logger } from '@infrastructure/config/Logger';
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-// dotenv.config()
+dotenv.config();
 
 async function startServer(): Promise<void> {
-    const app = createApp();
+    try {
+        // Validate environment variables before starting
+        EnvValidator.validate();
+        logger.info('Environment variables validated successfully');
 
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`);
-    });
+        const app = createApp();
 
-    const shutdown = async (signal: string) => {
-        console.log(`${signal} received, shutting down gracefully...`);
-        await DatabaseConnection.close();
-        process.exit(0);
-    };
+        const PORT = process.env.PORT || 3000;
+        app.listen(PORT, () => {
+            logger.info(`Server running on http://localhost:${PORT}`);
+        });
 
-    process.on('SIGTERM', () => shutdown('SIGTERM'));
-    process.on('SIGINT', () => shutdown('SIGINT'));
+        const shutdown = async (signal: string) => {
+            logger.info(`${signal} received, shutting down gracefully...`);
+            await DatabaseConnection.close();
+            logger.info('Database connection closed');
+            process.exit(0);
+        };
+
+        process.on('SIGTERM', () => shutdown('SIGTERM'));
+        process.on('SIGINT', () => shutdown('SIGINT'));
+    } catch (error) {
+        logger.error('Failed to start server', { error: error instanceof Error ? error.message : error });
+        process.exit(1);
+    }
 }
 
 startServer().catch((error) => {
-    console.error('Failed to start server:', error);
+    logger.error('Failed to start server', { error: error instanceof Error ? error.message : error });
     process.exit(1);
 });

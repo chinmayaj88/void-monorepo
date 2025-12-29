@@ -27,3 +27,8 @@ Thumbs.db
 docker-compose.override.yml
 docs
 
+# Storage directory (contains uploaded files)
+backend/storage/
+storage/
+*.storage
+

@@ -11,6 +11,17 @@ interface UserRow {
   totp_secret: string;
   created_at: Date;
   updated_at: Date;
+  email_verified: boolean | null;
+  email_verification_token: string | null;
+  email_verification_expires_at: Date | null;
+  password_reset_token: string | null;
+  password_reset_expires_at: Date | null;
+  failed_login_attempts: number | null;
+  account_locked_until: Date | null;
+  last_login_at: Date | null;
+  recovery_email: string | null;
+  recovery_email_verified: boolean | null;
+  recovery_email_verification_token: string | null;
 }
 
 export class UserRepository implements IUserRepository {
@@ -82,6 +93,114 @@ export class UserRepository implements IUserRepository {
 
   async delete(id: UserId): Promise<void> {
     await this.pool.query('DELETE FROM users WHERE id = $1', [id.toString()]);
+  }
+
+  async updateEmailVerificationToken(userId: UserId, token: string | null, expiresAt: Date | null): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET email_verification_token = $1, email_verification_expires_at = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3',
+      [token, expiresAt, userId.toString()]
+    );
+  }
+
+  async markEmailAsVerified(userId: UserId): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET email_verified = TRUE, email_verification_token = NULL, email_verification_expires_at = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+      [userId.toString()]
+    );
+  }
+
+  async findByEmailVerificationToken(token: string): Promise<User | null> {
+    const result = await this.pool.query<UserRow>(
+      'SELECT * FROM users WHERE email_verification_token = $1 AND email_verification_expires_at > CURRENT_TIMESTAMP',
+      [token]
+    );
+    return this.mapFirstRow(result);
+  }
+
+  async updatePasswordResetToken(userId: UserId, token: string | null, expiresAt: Date | null): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET password_reset_token = $1, password_reset_expires_at = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3',
+      [token, expiresAt, userId.toString()]
+    );
+  }
+
+  async findByPasswordResetToken(token: string): Promise<User | null> {
+    const result = await this.pool.query<UserRow>(
+      'SELECT * FROM users WHERE password_reset_token = $1 AND password_reset_expires_at > CURRENT_TIMESTAMP',
+      [token]
+    );
+    return this.mapFirstRow(result);
+  }
+
+  async incrementFailedLoginAttempts(userId: UserId): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET failed_login_attempts = COALESCE(failed_login_attempts, 0) + 1, updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+      [userId.toString()]
+    );
+  }
+
+  async resetFailedLoginAttempts(userId: UserId): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET failed_login_attempts = 0, updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+      [userId.toString()]
+    );
+  }
+
+  async lockAccount(userId: UserId, until: Date): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET account_locked_until = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+      [until, userId.toString()]
+    );
+  }
+
+  async unlockAccount(userId: UserId): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET account_locked_until = NULL, failed_login_attempts = 0, updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+      [userId.toString()]
+    );
+  }
+
+  async updateLastLogin(userId: UserId): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET last_login_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+      [userId.toString()]
+    );
+  }
+
+  async updateRecoveryEmail(userId: UserId, email: string | null): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET recovery_email = $1, recovery_email_verified = FALSE, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+      [email, userId.toString()]
+    );
+  }
+
+  async updateRecoveryEmailVerificationToken(userId: UserId, token: string | null): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET recovery_email_verification_token = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+      [token, userId.toString()]
+    );
+  }
+
+  async markRecoveryEmailAsVerified(userId: UserId): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET recovery_email_verified = TRUE, recovery_email_verification_token = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+      [userId.toString()]
+    );
+  }
+
+  async findByRecoveryEmailVerificationToken(token: string): Promise<User | null> {
+    const result = await this.pool.query<UserRow>(
+      'SELECT * FROM users WHERE recovery_email_verification_token = $1',
+      [token]
+    );
+    return this.mapFirstRow(result);
+  }
+
+  async updateTotpSecret(userId: UserId, totpSecret: string): Promise<void> {
+    await this.pool.query(
+      'UPDATE users SET totp_secret = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+      [totpSecret, userId.toString()]
+    );
   }
 
   private mapFirstRow(result: { rows: UserRow[] }): User | null {

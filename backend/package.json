@@ -14,13 +14,21 @@
         "lint": "eslint src --ext .ts",
         "lint:fix": "eslint src --ext .ts --fix",
         "format": "prettier --write \"src/**/*.ts\"",
-        "type-check": "tsc --noEmit"
+        "type-check": "tsc --noEmit",
+        "migrate:dev": "tsx scripts/migrate.ts run",
+        "migrate:prod": "tsx scripts/migrate.ts run --prod",
+        "migrate:status": "tsx scripts/migrate.ts status"
     },
     "dependencies": {
+        "@types/multer": "^2.0.0",
+        "@types/uuid": "^10.0.0",
         "argon2": "^0.31.2",
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
         "jsonwebtoken": "^9.0.2",
+        "multer": "^2.0.2",
+        "oci-objectstorage": "^2.90.0",
+        "oci-common": "^2.90.0",
         "otplib": "^12.0.1",
         "pg": "^8.11.3",
         "uuid": "^13.0.0",

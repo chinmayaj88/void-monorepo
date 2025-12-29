@@ -1,6 +1,6 @@
 import {
   registerSchema,
-  verifyCredentialsSchema,
+  loginSchema,
   verifyTotpSchema,
   refreshTokenSchema,
   logoutSchema,
@@ -249,14 +249,14 @@ describe('Auth Validators', () => {
     });
   });
 
-  describe('verifyCredentialsSchema', () => {
+  describe('loginSchema', () => {
     it('should accept valid credentials', () => {
       const valid = {
         email: 'test@example.com',
         password: 'anypassword',
       };
 
-      expect(() => verifyCredentialsSchema.parse(valid)).not.toThrow();
+      expect(() => loginSchema.parse(valid)).not.toThrow();
     });
 
     it('should reject invalid email', () => {
@@ -265,7 +265,7 @@ describe('Auth Validators', () => {
         password: 'password',
       };
 
-      expect(() => verifyCredentialsSchema.parse(invalid)).toThrow('Invalid email format');
+      expect(() => loginSchema.parse(invalid)).toThrow('Invalid email format');
     });
 
     it('should reject empty password', () => {
@@ -274,7 +274,7 @@ describe('Auth Validators', () => {
         password: '',
       };
 
-      expect(() => verifyCredentialsSchema.parse(invalid)).toThrow('Password is required');
+      expect(() => loginSchema.parse(invalid)).toThrow('Password is required');
     });
   });
 
